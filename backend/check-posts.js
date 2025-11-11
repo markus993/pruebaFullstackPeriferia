@@ -1,0 +1,1 @@
+const { PrismaClient } = require('@prisma/client');\nconst prisma = new PrismaClient();\n(async () => {\n  const posts = await prisma.post.findMany();\n  console.log(posts);\n  await prisma.();\n})();

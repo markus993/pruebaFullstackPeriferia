@@ -23,10 +23,12 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/dist ./dist
 COPY backend/package*.json ./
 COPY backend/prisma ./prisma
+COPY backend/src ./src
 COPY backend/tsconfig*.json ./
 COPY backend/docker-entrypoint.sh ./docker-entrypoint.sh
 
 RUN chmod +x docker-entrypoint.sh
+RUN sed -i 's/\r$//' docker-entrypoint.sh
 
 EXPOSE 3000
 

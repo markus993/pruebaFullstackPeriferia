@@ -12,12 +12,12 @@ Aplicación de red social interna donde los colaboradores pueden iniciar sesión
 
 - Node.js >= 20
 - npm >= 10
-- Docker Desktop >= 24 (Compose v2)
+- Docker y Docker Compose
 - PowerShell / Bash (según sistema operativo)
 
 ## Variables de entorno
 
-Las variables compartidas residen en `.env` (existe `.env.example` como referencia en la raíz):
+Las variables compartidas residen en `.env` (existe `env.example` como referencia en la raíz):
 
 | Variable | Descripción |
 | --- | --- |
@@ -32,49 +32,15 @@ Para desarrollo del frontend fuera de Docker puedes exportar `VITE_API_URL` (por
 
 ## Despliegue con Docker Compose
 
-1. Personaliza las variables (opcional):
-   ```powershell
-   Copy-Item .env .env.local
-   # Ajusta valores en .env según tu entorno
-   ```
+1. Personaliza las variables del archivo .ENV (opcional):
+
 2. Construye y levanta toda la solución:
    ```powershell
    docker compose up --build
    ```
-3. Endpoints principales:
+3. Urls principales:
    - Frontend: `http://localhost:${FRONTEND_PORT}` (por defecto `http://localhost:5173`)
    - API: `http://localhost:${API_PORT}/api` (por defecto `http://localhost:3000/api`)
-   - Health check: `GET /api/health`
-   - Login: `POST /api/auth/login`
-   - Perfil: `GET /api/users/me`
-   - Publicaciones: `GET /api/posts`
-
-El contenedor del backend ejecuta `prisma migrate deploy` y `prisma db seed` de forma idempotente en cada arranque.
-
-## Ejecución manual (sin Docker)
-
-1. Instala dependencias:
-   ```powershell
-   npm install --prefix backend
-   npm install --prefix frontend
-   ```
-2. Levanta PostgreSQL (puedes reutilizar `docker compose up postgres`).
-3. Exporta/ajusta `DATABASE_URL` y ejecuta Prisma:
-   ```powershell
-   cd backend
-   npm run prisma:generate
-   npm run prisma:migrate:deploy
-   npm run prisma:seed
-   ```
-4. Arranca los servidores en modo desarrollo:
-   ```powershell
-   # Backend (desde apps/api)
-   npm run start:dev
-
-   # Frontend (desde frontend)
-   npm run dev -- --host
-   ```
-5. Accede al frontend en `http://localhost:5173` (o el puerto que definas) y al backend en `http://localhost:3000/api`.
 
 ## Usuarios de prueba
 
@@ -101,6 +67,48 @@ Las rutas protegidas requieren encabezado `Authorization: Bearer <token>`.
 - `npm run prisma:seed` – Poblar datos iniciales.
 - `npm run start:dev` – Modo desarrollo con recarga.
 - `npm run build` / `npm run start:prod` – Compilar y ejecutar en modo producción.
+- `npm run test` – Ejecutar las pruebas unitarias del backend con Jest.
+
+### Cómo ejecutar las pruebas unitarias del backend
+
+1. Instala dependencias (solo la primera vez):
+
+   ```powershell
+   cd backend
+   npm install
+   ```
+
+2. Lanza la suite de pruebas:
+
+   ```powershell
+   npm run test
+   ```
+
+3. Para ver la cobertura:
+
+   ```powershell
+   npm run test:cov
+   ```
+
+#### Desde Docker Compose
+
+1. Asegúrate de tener los contenedores levantados:
+
+   ```powershell
+   docker compose up --build
+   ```
+
+2. Ejecuta las pruebas dentro del contenedor `api`:
+
+   ```powershell
+   docker compose exec api npm run test
+   ```
+
+3. Para generar cobertura desde Docker:
+
+   ```powershell
+   docker compose exec api npm run test:cov
+   ```
 
 ## Estructura del proyecto
 

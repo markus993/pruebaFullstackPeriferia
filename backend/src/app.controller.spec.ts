@@ -14,9 +14,12 @@ describe('AppController', () => {
     appController = app.get<AppController>(AppController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+  describe('health', () => {
+    it('debería retornar el estado de salud de la API', () => {
+      expect(appController.getHealth()).toEqual({
+        ok: true,
+        message: 'API Periferia Social operativa',
+      });
     });
   });
 });

@@ -45,6 +45,47 @@ cd pruebaFullstackPeriferia
 | carlos.mendez@periferia.it | `@carlitos` | `Periferia123!` |
 | laura.castillo@periferia.it | `@lauca` | `Periferia123!` |
 
+## 6. Ejecución de pruebas unitarias del backend
+
+1. Instala dependencias (solo la primera vez):
+
+   ```powershell
+   cd backend
+   npm install
+   ```
+
+2. Ejecuta los tests:
+
+   ```powershell
+   npm run test
+   ```
+
+3. Para un reporte de cobertura:
+
+   ```powershell
+   npm run test:cov
+   ```
+
+### Ejecución desde Docker Compose
+
+1. Levanta los servicios (si aún no lo hiciste):
+
+   ```powershell
+   docker compose up --build
+   ```
+
+2. Corre las pruebas dentro del contenedor `api`:
+
+   ```powershell
+   docker compose exec api npm run test
+   ```
+
+3. Para obtener cobertura en Docker:
+
+   ```powershell
+   docker compose exec api npm run test:cov
+   ```
+
 ## 7. Endpoints principales
 
 - `GET /api/health` – health check del backend.

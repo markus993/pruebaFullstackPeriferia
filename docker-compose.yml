@@ -1,0 +1,67 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: api
+    depends_on:
+      - postgres
+    env_file:
+      - ./.env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: ${NODE_ENV}
+    ports:
+      - ${API_PORT}:3000
+    networks:
+      - internal
+    restart: ${DOCKER_RESTART_POLICY}
+    command: ["./docker-entrypoint.sh"]
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        VITE_API_URL: http://localhost:${API_PORT}
+    container_name: frontend
+    depends_on:
+      - api
+    env_file:
+      - ./.env
+    environment:
+      VITE_API_URL: http://localhost:${API_PORT}
+    ports:
+      - ${FRONTEND_PORT}:80
+    networks:
+      - internal
+    restart: ${DOCKER_RESTART_POLICY}
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./config/initdb:/docker-entrypoint-initdb.d
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    networks:
+      - internal
+    restart: ${DOCKER_RESTART_POLICY}
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local

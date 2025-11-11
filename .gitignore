@@ -1,0 +1,34 @@
+# Node dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+**/dist/
+frontend/dist/
+
+# Environment files
+.env
+.env.*
+config/.env*
+
+# Logs
+logs/
+**/*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# IDE settings
+.vscode/
+.idea/
+
+# Prisma temp db
+device.db
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+
+# Docker
+**/*.pid
+**/tmp/

@@ -45,7 +45,11 @@ cd pruebaFullstackPeriferia
 | carlos.mendez@periferia.it | `@carlitos` | `Periferia123!` |
 | laura.castillo@periferia.it | `@lauca` | `Periferia123!` |
 
-## 6. Ejecución de pruebas unitarias del backend
+## 6. Pruebas unitarias
+
+### Backend (Jest)
+
+#### Ejecución local (backend)
 
 1. Instala dependencias (solo la primera vez):
 
@@ -66,9 +70,9 @@ cd pruebaFullstackPeriferia
    npm run test:cov
    ```
 
-### Ejecución desde Docker Compose
+#### Ejecución con Docker Compose (backend)
 
-1. Levanta los servicios (si aún no lo hiciste):
+1. Asegúrate de tener los servicios arriba:
 
    ```powershell
    docker compose up --build
@@ -86,6 +90,49 @@ cd pruebaFullstackPeriferia
    docker compose exec api npm run test:cov
    ```
 
+### Frontend (Vitest)
+
+#### Ejecución local (frontend)
+
+1. Instala dependencias (solo la primera vez):
+
+   ```powershell
+   cd frontend
+   npm install
+   ```
+
+2. Ejecuta los tests (modo una sola corrida):
+
+   ```powershell
+   npm run test -- --run
+   ```
+
+3. Para cobertura:
+
+   ```powershell
+   npm run test:coverage
+   ```
+
+#### Ejecución con Docker Compose (frontend)
+
+1. Asegúrate de tener el servicio levantado:
+
+   ```powershell
+   docker compose up --build frontend -d
+   ```
+
+2. Corre las pruebas dentro del contenedor `frontend`:
+
+   ```powershell
+   docker compose exec frontend npm run test -- --run
+   ```
+
+3. Para cobertura:
+
+   ```powershell
+   docker compose exec frontend npm run test:coverage
+   ```
+
 ## 7. Endpoints principales
 
 - `GET /api/health` – health check del backend.
@@ -94,10 +141,13 @@ cd pruebaFullstackPeriferia
 - `GET /api/posts` – feed de publicaciones de otros usuarios.
 - `POST /api/posts` – crear publicación.
 - `POST /api/posts/{id}/like` – enviar like idempotente.
+- Swagger UI: `http://localhost:3000/api/docs` (o `http://localhost:${API_PORT}/api/docs` si personalizaste el puerto).
 
 ## 8. Resolución de problemas
 
+
 - **Docker no arranca servicios**: Verifica que los puertos 3000/5173 estén libres.
 - **Seeds fallan**: borra los volúmenes de PostgreSQL (`docker compose down -v`) y vuelve a levantar.
+- **Frontend responde**: si acabas de inciar el servicio, espera unos 5-10 segundos, aun esta terminando el inicio del servicio Front.
 - **Frontend no llega al backend**: confirma que `VITE_API_URL` (o la URL configurada en Docker) apunta a `http://localhost:3000`.
 

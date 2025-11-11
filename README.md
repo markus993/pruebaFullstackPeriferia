@@ -8,16 +8,28 @@ Aplicación de red social interna donde los colaboradores pueden iniciar sesión
 - `frontend`: SPA en React + TypeScript con Zustand para manejo de estado global.
 - `postgres`: Base de datos PostgreSQL gestionada mediante migraciones Prisma.
 
-## Requisitos
+## Prerrequisitos
 
-- Node.js >= 20
-- npm >= 10
+- Node.js 20 o superior
+- npm 10 o superior
 - Docker y Docker Compose
-- PowerShell / Bash (según sistema operativo)
+- Acceso a PowerShell (Windows) o Bash (Linux/Mac)
+
+## Instalación local
+
+1. Clona el repositorio y entra en la carpeta del proyecto:
+
+   ```powershell
+   git clone https://github.com/markus993/pruebaFullstackPeriferia.git
+   cd pruebaFullstackPeriferia
+   ```
+
+2. Duplica el archivo `env.example` y renombra la copia a `.env`.
+3. Revisa y ajusta las variables de entorno críticas (ver sección siguiente).
 
 ## Variables de entorno
 
-Las variables compartidas residen en `.env` (existe `env.example` como referencia en la raíz):
+Las variables compartidas residen en `.env`; `env.example` es la plantilla base. Asegúrate de validar estos valores clave antes de ejecutar cualquier servicio:
 
 | Variable | Descripción |
 | --- | --- |
@@ -32,13 +44,15 @@ Para desarrollo del frontend fuera de Docker puedes exportar `VITE_API_URL` (por
 
 ## Despliegue con Docker Compose
 
-1. Personaliza las variables del archivo .ENV (opcional):
+1. Personaliza las variables de `.env` si lo necesitas.
+2. Construye y levanta la solución completa:
 
-2. Construye y levanta toda la solución:
    ```powershell
    docker compose up --build
    ```
-3. Urls principales:
+
+3. Espera a que el contenedor `api` muestre en los logs los mensajes “Executing seed” e “Iniciando servidor Nest”.
+4. Accede a los servicios:
    - Frontend: `http://localhost:${FRONTEND_PORT}` (por defecto `http://localhost:5173`)
    - API: `http://localhost:${API_PORT}/api` (por defecto `http://localhost:3000/api`)
 
@@ -50,49 +64,13 @@ Para desarrollo del frontend fuera de Docker puedes exportar `VITE_API_URL` (por
 | `@carlitos` | cmendez / carlos.mendez@periferia.it | `Periferia123!` |
 | `@lauca` | lcastillo / laura.castillo@periferia.it | `Periferia123!` |
 
-## Endpoints relevantes
-
-- `POST /api/auth/login` – Devuelve `{ token, user }` tras validar credenciales.
-- `GET /api/users/me` – Retorna el perfil del usuario autenticado.
-- `GET /api/posts` – Feed de publicaciones de otros usuarios (likes agregados).
-- `POST /api/posts` – Crea una publicación propia.
-- `POST /api/posts/:id/like` – Envia un like idempotente a la publicación indicada.
-- Documentación interactiva Swagger: `GET /api/docs` (requiere `docker compose up` o servidor local activo).
-
-Las rutas protegidas requieren encabezado `Authorization: Bearer <token>`.
-
-## Documentación interactiva de la API (Swagger)
-
-- Swagger UI se expone en `http://localhost:${API_PORT}/api/docs` (por defecto `http://localhost:3000/api/docs`).
-- Incluye esquema OpenAPI con autenticación Bearer; puedes probar endpoints e incluir tu token JWT desde la interfaz.
-- Al ejecutar con Docker:
-  ```powershell
-  docker compose up --build
-  ```
-  Luego abre la URL anterior en tu navegador.
-
-## Scripts útiles (apps/api)
-
-- `npm run prisma:generate` – Generar cliente Prisma a partir del esquema.
-- `npm run prisma:migrate:dev` / `npm run prisma:migrate:deploy` – Aplicar migraciones.
-- `npm run prisma:seed` – Poblar datos iniciales.
-- `npm run start:dev` – Modo desarrollo con recarga.
-- `npm run build` / `npm run start:prod` – Compilar y ejecutar en modo producción.
-
-## Scripts útiles (apps/web)
-
-- `npm run dev` – Levantar el frontend en modo desarrollo.
-- `npm run build` – Generar la versión productiva.
-- `npm run lint` – Ejecutar reglas de ESLint.
-- `npm run test` – Ejecutar las pruebas unitarias con Vitest.
-
 ## Pruebas unitarias
 
 ### Backend (Jest)
 
-#### Ejecución local (backend)
+**Ejecución local**
 
-1. Instala dependencias (una sola vez):
+1. Instala dependencias (solo la primera vez):
 
    ```powershell
    cd backend
@@ -111,7 +89,7 @@ Las rutas protegidas requieren encabezado `Authorization: Bearer <token>`.
    npm run test:cov
    ```
 
-#### Ejecución con Docker Compose (backend)
+**Ejecución con Docker Compose**
 
 1. Levanta los servicios si aún no lo hiciste:
 
@@ -119,13 +97,13 @@ Las rutas protegidas requieren encabezado `Authorization: Bearer <token>`.
    docker compose up --build
    ```
 
-2. Corre los tests dentro del contenedor:
+2. Corre las pruebas dentro del contenedor:
 
    ```powershell
    docker compose exec api npm run test
    ```
 
-3. Cobertura desde Docker:
+3. Genera cobertura:
 
    ```powershell
    docker compose exec api npm run test:cov
@@ -133,9 +111,9 @@ Las rutas protegidas requieren encabezado `Authorization: Bearer <token>`.
 
 ### Frontend (Vitest)
 
-#### Ejecución local (frontend)
+**Ejecución local**
 
-1. Instala dependencias (una sola vez):
+1. Instala dependencias (solo la primera vez):
 
    ```powershell
    cd frontend
@@ -154,9 +132,9 @@ Las rutas protegidas requieren encabezado `Authorization: Bearer <token>`.
    npm run test:coverage
    ```
 
-#### Ejecución con Docker Compose (frontend)
+**Ejecución con Docker Compose**
 
-1. Asegúrate de que el servicio esté levantado:
+1. Asegúrate de que el servicio frontend esté levantado:
 
    ```powershell
    docker compose up --build frontend -d
@@ -168,11 +146,45 @@ Las rutas protegidas requieren encabezado `Authorization: Bearer <token>`.
    docker compose exec frontend npm run test -- --run
    ```
 
-3. Genera cobertura desde Docker Compose:
+3. Genera cobertura:
 
    ```powershell
    docker compose exec frontend npm run test:coverage
    ```
+
+## Endpoints relevantes
+
+- `GET /api/health` – Health check del backend.
+- `POST /api/auth/login` – Devuelve `{ token, user }` tras validar credenciales.
+- `GET /api/users/me` – Retorna el perfil del usuario autenticado.
+- `GET /api/posts` – Feed de publicaciones de otros usuarios (likes agregados).
+- `POST /api/posts` – Crea una publicación propia.
+- `POST /api/posts/:id/like` – Envía un like idempotente.
+
+Las rutas protegidas requieren el encabezado `Authorization: Bearer <token>`.
+
+## Documentación interactiva de la API (Swagger)
+
+- Swagger UI se expone en `http://localhost:${API_PORT}/api/docs` (por defecto `http://localhost:3000/api/docs`).
+- Incluye esquema OpenAPI con autenticación Bearer; puedes probar endpoints e incluir tu token JWT desde la interfaz.
+- Si ejecutas con Docker, levanta los servicios con `docker compose up --build` y luego abre la URL anterior en tu navegador.
+
+## Scripts útiles
+
+**Backend (`backend`)**
+
+- `npm run prisma:generate` – Generar cliente Prisma a partir del esquema.
+- `npm run prisma:migrate:dev` / `npm run prisma:migrate:deploy` – Aplicar migraciones.
+- `npm run prisma:seed` – Poblar datos iniciales.
+- `npm run start:dev` – Modo desarrollo con recarga.
+- `npm run build` / `npm run start:prod` – Compilar y ejecutar en producción.
+
+**Frontend (`frontend`)**
+
+- `npm run dev` – Levantar el frontend en modo desarrollo.
+- `npm run build` – Generar la versión productiva.
+- `npm run lint` – Ejecutar reglas de ESLint.
+- `npm run test` – Ejecutar pruebas unitarias con Vitest.
 
 ## Estructura del proyecto
 
@@ -193,10 +205,3 @@ Las rutas protegidas requieren encabezado `Authorization: Bearer <token>`.
 
 - `docs/manual_instalacion.md`: Guía editable con pasos de instalación.
 - `docs/manual_instalacion.pdf`: Versión en PDF generada desde la guía.
-
-## Próximos pasos sugeridos
-
-- Integrar CI/CD para ejecutar lint, build y tests automáticamente.
-- Incorporar Swagger u otra documentación interactiva para los endpoints.
-- Extender el modelo con refresh tokens y recuperación de contraseña.
-- Monitorizar contenedores (Prometheus + Grafana) y centralizar logs.

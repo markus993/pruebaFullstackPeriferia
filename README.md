@@ -57,8 +57,19 @@ Para desarrollo del frontend fuera de Docker puedes exportar `VITE_API_URL` (por
 - `GET /api/posts` – Feed de publicaciones de otros usuarios (likes agregados).
 - `POST /api/posts` – Crea una publicación propia.
 - `POST /api/posts/:id/like` – Envia un like idempotente a la publicación indicada.
+- Documentación interactiva Swagger: `GET /api/docs` (requiere `docker compose up` o servidor local activo).
 
 Las rutas protegidas requieren encabezado `Authorization: Bearer <token>`.
+
+## Documentación interactiva de la API (Swagger)
+
+- Swagger UI se expone en `http://localhost:${API_PORT}/api/docs` (por defecto `http://localhost:3000/api/docs`).
+- Incluye esquema OpenAPI con autenticación Bearer; puedes probar endpoints e incluir tu token JWT desde la interfaz.
+- Al ejecutar con Docker:
+  ```powershell
+  docker compose up --build
+  ```
+  Luego abre la URL anterior en tu navegador.
 
 ## Scripts útiles (apps/api)
 
@@ -67,52 +78,105 @@ Las rutas protegidas requieren encabezado `Authorization: Bearer <token>`.
 - `npm run prisma:seed` – Poblar datos iniciales.
 - `npm run start:dev` – Modo desarrollo con recarga.
 - `npm run build` / `npm run start:prod` – Compilar y ejecutar en modo producción.
-- `npm run test` – Ejecutar las pruebas unitarias del backend con Jest.
 
-### Cómo ejecutar las pruebas unitarias del backend
+## Scripts útiles (apps/web)
 
-1. Instala dependencias (solo la primera vez):
+- `npm run dev` – Levantar el frontend en modo desarrollo.
+- `npm run build` – Generar la versión productiva.
+- `npm run lint` – Ejecutar reglas de ESLint.
+- `npm run test` – Ejecutar las pruebas unitarias con Vitest.
+
+## Pruebas unitarias
+
+### Backend (Jest)
+
+#### Ejecución local (backend)
+
+1. Instala dependencias (una sola vez):
 
    ```powershell
    cd backend
    npm install
    ```
 
-2. Lanza la suite de pruebas:
+2. Ejecuta la suite:
 
    ```powershell
    npm run test
    ```
 
-3. Para ver la cobertura:
+3. Genera cobertura:
 
    ```powershell
    npm run test:cov
    ```
 
-#### Desde Docker Compose
+#### Ejecución con Docker Compose (backend)
 
-1. Asegúrate de tener los contenedores levantados:
+1. Levanta los servicios si aún no lo hiciste:
 
    ```powershell
    docker compose up --build
    ```
 
-2. Ejecuta las pruebas dentro del contenedor `api`:
+2. Corre los tests dentro del contenedor:
 
    ```powershell
    docker compose exec api npm run test
    ```
 
-3. Para generar cobertura desde Docker:
+3. Cobertura desde Docker:
 
    ```powershell
    docker compose exec api npm run test:cov
    ```
 
+### Frontend (Vitest)
+
+#### Ejecución local (frontend)
+
+1. Instala dependencias (una sola vez):
+
+   ```powershell
+   cd frontend
+   npm install
+   ```
+
+2. Ejecuta las pruebas (modo una sola corrida):
+
+   ```powershell
+   npm run test -- --run
+   ```
+
+3. Obtén cobertura:
+
+   ```powershell
+   npm run test:coverage
+   ```
+
+#### Ejecución con Docker Compose (frontend)
+
+1. Asegúrate de que el servicio esté levantado:
+
+   ```powershell
+   docker compose up --build frontend -d
+   ```
+
+2. Corre las pruebas dentro del contenedor `frontend`:
+
+   ```powershell
+   docker compose exec frontend npm run test -- --run
+   ```
+
+3. Genera cobertura desde Docker Compose:
+
+   ```powershell
+   docker compose exec frontend npm run test:coverage
+   ```
+
 ## Estructura del proyecto
 
-```
+```text
 ├── backend/                # Backend unificado Nest.js + Prisma
 │   ├── Dockerfile
 │   ├── docker-entrypoint.sh
@@ -132,7 +196,6 @@ Las rutas protegidas requieren encabezado `Authorization: Bearer <token>`.
 
 ## Próximos pasos sugeridos
 
-- Añadir pruebas unitarias e2e (Jest / Playwright) para backend y frontend.
 - Integrar CI/CD para ejecutar lint, build y tests automáticamente.
 - Incorporar Swagger u otra documentación interactiva para los endpoints.
 - Extender el modelo con refresh tokens y recuperación de contraseña.

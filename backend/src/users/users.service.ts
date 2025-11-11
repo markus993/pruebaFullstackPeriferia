@@ -25,11 +25,7 @@ export class UsersService {
     });
   }
 
-  toSafeUser(user: User | null): SafeUser | null {
-    if (!user) {
-      return null;
-    }
-
+  toSafeUser(user: User): SafeUser {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...safe } = user;
     return safe;
